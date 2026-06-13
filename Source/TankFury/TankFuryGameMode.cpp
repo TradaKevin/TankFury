@@ -3,3 +3,41 @@
 
 #include "TankFuryGameMode.h"
 
+#include "Kismet/GameplayStatics.h"
+#include "Tower.h"
+
+void ATankFuryGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	TArray<AActor*> Towers;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATower::StaticClass(), Towers);
+	TowerCount = Towers.Num();
+	UE_LOG(LogTemp, Display, TEXT("TowerCount: %d"), TowerCount);
+
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	if (PlayerPawn)
+	{
+		Tank = Cast<ATank>(PlayerPawn);
+		if (!Tank)
+		{
+			UE_LOG(LogTemp, Display, TEXT("Faild to Find Tank Actor!"));
+		}
+	}
+	int32 LoopIndex = 0;
+	while (LoopIndex < TowerCount)
+	{
+		AActor* TowerActor = Towers[LoopIndex];
+		if (TowerActor)
+		{
+			ATower* Tower = Cast<ATower>(TowerActor);
+			if (Tower && Tank)
+			{
+				Tower->Tank = Tank;
+				//UE_LOG(LogTemp, Display, TEXT("%s: Tank Variable Set!"), *Tower->GetActorNameOrLabel());
+			}
+		}
+
+		LoopIndex++;
+	}
+}
