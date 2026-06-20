@@ -44,9 +44,14 @@ void ATankFuryGameMode::BeginPlay()
 
 void ATankFuryGameMode::ActorDied(AActor* DeadActor)
 {
+	bool IsGameOver = false;
+	bool IsVictory = false;
+
 	if (DeadActor == Tank)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Tank Died, Defeat!"));
+		Tank->HandleDestruction();
+
+		IsGameOver = true;
 	}
 	else
 	{
@@ -54,17 +59,39 @@ void ATankFuryGameMode::ActorDied(AActor* DeadActor)
 
 		if (DeadTower)
 		{
-			UE_LOG(LogTemp, Display, TEXT("Tower Died!"));
-
-			DeadTower->Destroy();
+			DeadTower->HandleDestruction();
 
 			TowerCount--;
 
 			if (TowerCount <= 0)
 			{
-				UE_LOG(LogTemp, Display, TEXT("All Towers are Died, Taste  the victory (for first time you looser)!"));
+				IsGameOver = true;
+				IsVictory = true;
 
 			}
 		}
 	}
+
+	if (IsGameOver)
+	{
+		FString GameOverString = IsVictory ? "Victory!" : "Defeat!";
+
+		UE_LOG(LogTemp, Display, TEXT("Game Over: %s"), *GameOverString);
+
+		FTimerHandle GameOverTimerHandle;
+
+		GetWorldTimerManager().SetTimer(
+			GameOverTimerHandle,
+			this,
+			&ATankFuryGameMode::OnGameOverTimerTimeout,
+			GameOverDelay,
+			false
+		);
+	}
+}
+
+void ATankFuryGameMode::OnGameOverTimerTimeout()
+{
+	FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	UGameplayStatics::OpenLevel(GetWorld(), *CurrentLevelName);
 }
