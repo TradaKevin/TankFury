@@ -5,6 +5,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Tower.h"
+#include "TankFuryGameInstance.h"
 
 void ATankFuryGameMode::BeginPlay()
 {
@@ -40,12 +41,37 @@ void ATankFuryGameMode::BeginPlay()
 
 		LoopIndex++;
 	}
+
+	CountdownSeconds = CountdownDelay;
+
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ATankFuryGameMode::OnCountdownTimerTimeout, 1.0f, true);
+}
+
+
+void ATankFuryGameMode::OnCountdownTimerTimeout()
+{
+	CountdownSeconds--;
+
+	if (CountdownSeconds > 0)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Countdown: %d"), CountdownSeconds);
+	}
+	else if (CountdownSeconds == 0)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Start!"));
+		Tank->SetPlayerEnabled(true);
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(CountdownTimerHandle);
+		UE_LOG(LogTemp, Display, TEXT("Clear Timer!"));
+	}
 }
 
 void ATankFuryGameMode::ActorDied(AActor* DeadActor)
 {
 	bool IsGameOver = false;
-	bool IsVictory = false;
+	IsVictory = false;
 
 	if (DeadActor == Tank)
 	{
@@ -92,6 +118,22 @@ void ATankFuryGameMode::ActorDied(AActor* DeadActor)
 
 void ATankFuryGameMode::OnGameOverTimerTimeout()
 {
-	FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
-	UGameplayStatics::OpenLevel(GetWorld(), *CurrentLevelName);
+	UGameInstance* GameInstance = GetGameInstance();
+	if (GameInstance)
+	{
+		UTankFuryGameInstance* TankFuryGameInstance = Cast<UTankFuryGameInstance>(GameInstance);
+
+		if (TankFuryGameInstance)
+		{
+			if (IsVictory)
+			{
+				TankFuryGameInstance->LoadNextLevel();
+			}
+			else
+			{
+				TankFuryGameInstance->RestartCurrentLevel();
+			}
+		}
+	}
 }
+
