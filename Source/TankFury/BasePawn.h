@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Projectile.h"
+#include "NiagaraFunctionLibrary.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -33,6 +34,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AProjectile> ProjectileClass;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* DeathParticles;
 
 	void RotateTurret(FVector LookAtTarget);
 
