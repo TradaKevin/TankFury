@@ -52,6 +52,7 @@ void ATankFuryGameMode::BeginPlay()
 		{
 			ScreenMessageWidget->AddToPlayerScreen();
 			ScreenMessageWidget->SetMessageText("Get Ready!");
+
 		}
 	}
 
@@ -72,7 +73,7 @@ void ATankFuryGameMode::OnCountdownTimerTimeout()
 	}
 	else if (CountdownSeconds == 0)
 	{
-		ScreenMessageWidget->SetMessageText("Start!");
+		ScreenMessageWidget->SetMessageText("Start!\nDestroy all enemies!");
 		Tank->SetPlayerEnabled(true);
 	}
 	else

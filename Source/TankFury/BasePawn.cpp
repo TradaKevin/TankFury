@@ -48,6 +48,11 @@ void ABasePawn::Fire()
 	if (Projectile)
 	{
 		Projectile->SetOwner(this);
+
+		if (ChangeDamage)
+		{
+			Projectile->SetDamage(Damage);
+		}
 	}
 
 }

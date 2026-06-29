@@ -81,3 +81,8 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 	Destroy();
 }
 
+void AProjectile::SetDamage(float NewDamage)
+{
+	Damage = NewDamage;
+}
+
