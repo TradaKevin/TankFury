@@ -7,6 +7,9 @@
 #include "Projectile.h"
 #include "NiagaraFunctionLibrary.h"
 
+#include "HealthComponent.h"
+#include "Components/WidgetComponent.h"
+
 #include "Components/CapsuleComponent.h"
 
 #include "BasePawn.generated.h"
@@ -15,6 +18,9 @@ UCLASS()
 class TANKFURY_API ABasePawn : public APawn
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void BeginPlay() override;
 
 public:
 	// Sets default values for this pawn's properties
@@ -55,4 +61,12 @@ public:
 	void Fire();
 
 	void HandleDestruction();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	UWidgetComponent* HealthBarWidget;
+
+	UPROPERTY()
+	UHealthComponent* HealthComponent;
+
+	void UpdateHealthBar();
 };

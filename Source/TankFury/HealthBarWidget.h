@@ -23,4 +23,5 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	UProgressBar* HealthProgressBar;
+
 };

@@ -4,6 +4,7 @@
 #include "HealthComponent.h"
 #include "TankFuryGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "BasePawn.h"
 
 
 // Sets default values for this component's properties
@@ -47,9 +48,18 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UHealthComponent::OnDamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
+
 	if (Damage > 0.0f)
 	{
-		Health -= Damage;
+		//Health -= Damage;
+		Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+
+		ABasePawn* BasePawn = Cast<ABasePawn>(GetOwner());
+
+		if (BasePawn)
+		{
+			BasePawn->UpdateHealthBar();
+		}
 
 		if (Health <= 0.0f)
 		{
@@ -59,5 +69,16 @@ void UHealthComponent::OnDamageTaken(AActor* DamagedActor, float Damage, const U
 			}
 		}
 	}
+}
+
+float UHealthComponent::GetHealthPercent() const
+{
+
+	if (MaxHealth <= 0.f)
+	{
+		return 0.f;
+	}
+
+	return Health / MaxHealth;
 }
 

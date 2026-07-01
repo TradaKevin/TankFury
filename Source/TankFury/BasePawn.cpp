@@ -3,6 +3,7 @@
 
 #include "BasePawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "HealthBarWidget.h"
 
 // Sets default values
 ABasePawn::ABasePawn()
@@ -21,7 +22,22 @@ ABasePawn::ABasePawn()
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
 	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
+
+	HealthBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBarWidget"));
+	HealthBarWidget->SetupAttachment(RootComponent);
+	HealthBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	HealthBarWidget->SetDrawSize(FVector2D(120.f, 15.f));
+	HealthBarWidget->SetRelativeLocation(FVector(0.f, 0.f, 120.f));
 	
+}
+
+void ABasePawn::BeginPlay()
+{
+	Super::BeginPlay();
+
+	HealthComponent = FindComponentByClass<UHealthComponent>();
+
+	UpdateHealthBar();
 }
 
 void ABasePawn::RotateTurret(FVector LookAtTarget)
@@ -81,3 +97,22 @@ void ABasePawn::HandleDestruction()
 	}
 }
 
+void ABasePawn::UpdateHealthBar()
+{
+	if (!HealthComponent)
+	{
+		HealthComponent = FindComponentByClass<UHealthComponent>();
+	}
+
+	if (HealthBarWidget && HealthComponent)
+	{
+		UHealthBarWidget* Widget = Cast<UHealthBarWidget>(
+			HealthBarWidget->GetUserWidgetObject()
+		);
+
+		if (Widget)
+		{
+			Widget->SetHealthPercent(HealthComponent->GetHealthPercent());
+		}
+	}
+}
